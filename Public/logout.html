@@ -1,0 +1,25 @@
+<!-- logout.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Logout</title>
+  </head>
+  <body>
+    <h1>You have been logged out</h1>
+    <p>You will be redirected to the login page in <span id="countdown">5</span> seconds.</p>
+    <script>
+      function redirectToLogin() {
+        window.location = 'login.html';
+      }
+      var countdown = 5;
+      var countdownInterval = setInterval(function() {
+        countdown--;
+        document.getElementById('countdown').textContent = countdown;
+        if (countdown === 0) {
+          clearInterval(countdownInterval);
+          redirectToLogin();
+        }
+      }, 1000);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+const MongoClient = require('mongodb').MongoClient;
+const bcrypt = require('bcrypt');
+
+const dotenv = require('dotenv');
+dotenv.config({ path: './.env' });
+
+const url = process.env.MONGODB_URI;
+const client = new MongoClient(url, { useNewUrlParser: true });
+const dbName = process.env.DB;
+const db = client.db(dbName);
+const collection = db.collection('users');
+
+async function connect() {
+  try {
+    await client.connect();
+    console.log('Connected to MongoDB');
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function alluser() {
+
+  try {
+    let cursor = collection.find({});
+    while (await cursor.hasNext()) {
+      let doc = await cursor.next();
+      console.log(doc);
+      return doc;
+      
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function insertUser(user) {
+  try {
+    // Connect to the database
+    console.log('insert User Connected to MongoDB');
+    // Insert the user object into the collection
+    await collection.insertOne(user);
+    console.log('User inserted into the collection');
+
+    // Close the connection
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function getUserByUsername(username) {
+  console.log("/getUseBy username:", username);
+  const user = await collection.findOne({"username" : username });
+  console.log("Inside getUser function : ",user);
+  return user;
+}
+
+async function registerUser(user) {
+  // Generate a salt
+  const salt = await bcrypt.genSalt();
+  // Hash the password with the salt
+  const hashedPassword = await bcrypt.hash(user.password, salt);
+  // Update the user object with the hashed password
+  user.password = hashedPassword;
+  // Insert the user into the database
+
+  const result = await collection.insertOne(user);
+  return result;
+}
+
+// Export the insertUser function using the module.exports object
+module.exports.insertUser = insertUser;
+module.exports.connect = connect;
+module.exports.alluser = alluser;
+module.exports.getUserByUsername = getUserByUsername;
+module.exports.registerUser = registerUser;

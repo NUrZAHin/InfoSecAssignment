@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Register</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  </head>
+  <body>
+    <form id="register-form">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required />
+      <br />
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required />
+      <br />
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required />
+      <br />
+      <label for="matrix">Matrix No:</label>
+      <input type="text" id="matrix" name="matrix" required />
+      <br />
+      <label for="email">Email:</label>
+      <input type="text" id="email" name="email" required />
+      <br />
+      <label for="phone">Phone No:</label>
+      <input type="text" id="phone" name="phone" required />
+      <br />
+      <label for="address">Address:</label>
+      <input type="text" id="address" name="address" required />
+      <br />
+      <div class="g-recaptcha" data-sitekey="6LcZKNojAAAAALnfqpWzaOASzitcF1fm1N90IGfV"z></div>
+      <br />
+      <button type="submit">Register</button>
+
+    </form>
+    <script>
+      const form = document.getElementById('register-form');
+      
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        // const formData = new FormData(form);
+        const formData = {
+          username : form.username.value,
+          password : form.password.value,
+          name : form.name.value,
+          matrix : form.matrix.value,
+          email : form.email.value,
+          phone : form.phone.value,
+          address : form.address.value,
+          recaptcha : grecaptcha.getResponse()
+        }
+        try {
+          const response = await fetch('http://127.0.0.1:3000/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(formData)
+            });
+          const result = await response.json();
+          console.log ("Register result :",result);
+          if (result.success) {
+            // Registration successful, redirect the user to the login page
+            alert('Registration successful. Please login.');
+            window.location.replace('login.html');
+          } else {
+            // Registration failed, display an error message
+            alert(result.message);
+          }
+        } catch (error) {
+          console.error(error);
+          alert('An error occurred while attempting to register. Please try again later.');
+          window.location = 'register.html';
+        }
+      });
+    </script>
+  </body>
+</html>
