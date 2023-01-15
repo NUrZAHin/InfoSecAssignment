@@ -2,10 +2,6 @@
 <html>
   <head>
     <title>Login</title>
-    <script 
-    const dotenv = require('dotenv'); >
-  
-    </script>
 
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   </head>
@@ -42,6 +38,7 @@
           const result = await response.json();
           if (result.success) { 
             // Login successful, redirect the user to the home page
+            document.cookie = result.UserCookie;
             window.location.replace('login-success.html');
           } else {
             // Login failed, display an error message

@@ -8,15 +8,15 @@ const recaptcha = require('recaptcha2');
 const recaptchaVerify = require('recaptcha-verify');
 const fetch = require('node-fetch');
 var request = require("request");
-const session = require("express-session")
-const filestore = require("session-file-store")(session)
-const path = require("path")
+const jwt = require('jsonwebtoken');
+
 const cookieParser = require('cookie-parser');
 
 
 dotenv.config({ path: './.env' });
 
 const port = process.env.PORT;
+const secretKey = process.env.JWT_SECRET_KEY;
 console.log("Port:", port);
 
 const app = express();
@@ -80,6 +80,20 @@ app.use(cookieParser());
 // Middlewares
 // app.use(auth)
 // app.use(express.static(path.join(__dirname, 'public')));
+
+// app.use((req, res, next) => {
+//   const token = req.headers['authorization'];
+//   if (!token) {
+//     return res.status(401).json({ message: 'Unauthorized' });
+//   }
+//   try {
+//     const decoded = jwt.verify(token, secretKey);
+//     req.user = decoded;
+//     next();
+//   } catch (error) {
+//     return res.status(401).json({ message: 'Unauthorized error' });
+//   }
+// });
 
 app.use((req, res, next) => {
   res.setHeader('Content-Security-Policy', "font-src 'self'");
@@ -177,9 +191,16 @@ app.post('/login', async (req, res) => {
         return;
       }
       if (bodyObject.success == true) {
-        res.json({ success: true, message: 'Valid reCAPTCHA' });
         console.log("Valid reCAPTCHA")
-        res.cookie('username', req.body.username , { maxAge: 900000, httpOnly: true });
+        const payload = {
+          userId: user.id,
+          username: user.username
+        };
+        // secretKey = process.env.JWT_SECRET_KEY;
+        const token = jwt.sign(payload, secretKey, { expiresIn: '1h' });
+        res.cookie("UserCookie", token, { maxAge: 300000, httpOnly: true });
+        console.log("token : ", token)
+        res.json({ success: true, message: 'Valid reCAPTCHA' , UserCookie: token});
 
         return;
       }
@@ -262,16 +283,75 @@ app.post('/register', async (req, res) => {
   }
 });
 
-app.get('/logout', (req, res) => {
-  res.clearCookie('username');
-  res.redirect('/login');
+app.post('/logout', (req, res) => {
+
+  let jwtSecretKey = process.env.JWT_SECRET_KEY;
+  
+  try {
+      const token = req.body.token;
+      // Invalidate the token
+      jwt.verify(token, jwtSecretKey,(err, user) => {
+        console.log("Verifying token :" , token)
+          if(err){
+            console.log("Invalid Token ERROR : ", err)
+              throw new Error("Invalid Token");
+          }
+          // Save the token in black list or update the expiration date
+          // remove the token from the client's storage
+          console.log("Someone has logout : ", user.username)
+          res.clearCookie("jwt");
+          res.json({success: true, message:"Successfully logged out"});
+      });
+  } catch (error) {
+      // Token not found
+      console.log("Error : " , error)
+      return res.status(401).send("Token not found");
+  }
 });
 
-app.post('/use', (req, res) => {
-  const user = req.body;
-  database.insertUser(user).then(() => {
-    res.send('User inserted into the database');
-  });
+app.post('/getdata', async (req, res) => {
+  
+  let jwtSecretKey = process.env.JWT_SECRET_KEY;
+
+  async function GettingTheData (user){
+
+    const result = await database.getUserByUsername(user);
+    console.log("result : ", result)
+
+    const data = {
+      success: true,
+      username: result.username,
+      name: result.name,
+      matrix: result.matrix,
+      email: result.email,
+      phone: result.phone,
+      address: result.address
+    }
+    return data;
+  }
+  
+  try {
+      const token = req.body.token;
+      // Invalidate the token
+      jwt.verify(token, jwtSecretKey, async (err, user) => {
+        console.log("Verifying token for getdata:" , token)
+          if(err){
+            console.log("Invalid Token ERROR : ", err)
+              throw new Error("Invalid Token");
+          }
+          // Save the token in black list or update the expiration date
+          // remove the token from the client's storage
+          console.log("Someone has logout : ", user)
+          const data = await GettingTheData(user.username);
+          console.log("data GETDATA: ", data)
+          res.json(data);
+          return;
+      });
+  } catch (error) {
+      // Token not found
+      console.log("Error : " , error)
+      return res.status(401).send("Token not found");
+  }
 });
 
 app.put('/users/:id', (req, res) => {

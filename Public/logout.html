@@ -1,25 +1,101 @@
 <!-- logout.html -->
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Logout</title>
-  </head>
-  <body>
-    <h1>You have been logged out</h1>
-    <p>You will be redirected to the login page in <span id="countdown">5</span> seconds.</p>
-    <script>
-      function redirectToLogin() {
+
+<head>
+  <title>Logout</title>
+</head>
+
+<body>
+  <h1>You have been logged out</h1>
+  <p>You will be redirected to the login page in <span id="countdown">5</span> seconds.</p>
+  <script>
+    async function logout() {
+      try {
+        function getCookie(name) {
+          let value = "; " + document.cookie;
+          let parts = value.split("; " + name + "=");
+          if (parts.length === 2) return parts.pop().split(";").shift();
+        }
+
+        let myCookie = getCookie("UserCookie");
+        console.log(myCookie);
+        // Output: "myValue"
+
+        let headers = new Headers();
+        headers.append('Cookie', 'myCookie=' + myCookie);
+        console.log("COOKIEEE doc:",document.cookie);
+
+        const formData = {
+          token : document.cookie
+        };
+
+        const response = await fetch('http://127.0.0.1:3000/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+        const result = await response.json();
+        console.log("LOGOUT", result);
+        if (result.success) {
+          // Login successful, redirect the user to the home page
+
+          function redirectToLogin() {
+            window.location = 'login.html';
+          }
+          var countdown = 5;
+          var countdownInterval = setInterval(function () {
+            countdown--;
+            document.getElementById('countdown').textContent = countdown;
+            if (countdown === 0) {
+              clearInterval(countdownInterval);
+              redirectToLogin();
+            }
+          }, 1000);
+
+
+        } else {
+          // Login failed, display an error message
+
+          var countdownInterval = setInterval(function () {
+            countdown--;
+            document.getElementById('countdown').textContent = countdown;
+            if (countdown === 0) {
+              clearInterval(countdownInterval);
+              redirectToLogin();
+            }
+          }, 1000);
+
+          window.location.replace('login.html');
+          alert(result.message);
+        }
+      } catch (error) {
+        console.error(error);
+
+
+        alert('An error occurred while attempting to login. Please try again later.');
+
+        var countdownInterval = setInterval(function () {
+          countdown--;
+          document.getElementById('countdown').textContent = countdown;
+          if (countdown === 0) {
+            clearInterval(countdownInterval);
+            redirectToLogin();
+          }
+        }, 1000);
+
         window.location = 'login.html';
       }
-      var countdown = 5;
-      var countdownInterval = setInterval(function() {
-        countdown--;
-        document.getElementById('countdown').textContent = countdown;
-        if (countdown === 0) {
-          clearInterval(countdownInterval);
-          redirectToLogin();
-        }
-      }, 1000);
-    </script>
-  </body>
+      ;
+    }
+
+    logout();
+
+  </script>
+
+
+</body>
+
 </html>

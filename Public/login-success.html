@@ -1,12 +1,65 @@
 <!-- login-success.html -->
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Login Success</title>
-  </head>
-  <body>
-    <h1>Welcome back, User!</h1>
-    <p>You have successfully logged in.</p>
-    <a href="logout.html">Log out</a>
-  </body>
+
+<head>
+  <title>Login Success</title>
+</head>
+
+<body>
+  <h1>Welcome back, User!</h1>
+  <p>You have successfully logged in.</p>
+
+  <script>
+    async function getdata() {
+      try {
+        console.log("COOKIEEE doc:", document.cookie);
+        const formData = {
+          token: document.cookie
+        };
+        const response = await fetch('http://127.0.0.1:3000/getdata', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+        const result = await response.json();
+        console.log("This is data :", result);
+        if (result.success) {
+          // Login successful, redirect the user to the home page
+          document.getElementById("username").innerHTML = result.username;
+          document.getElementById("name").innerHTML = result.name;
+          document.getElementById("matrix").innerHTML = result.matrix;
+          document.getElementById("email").innerHTML = result.email;
+          document.getElementById("phone").innerHTML = result.phone;
+          document.getElementById("address").innerHTML = result.address;
+        } else {
+          // Login failed, display an error message
+
+          window.location.replace('login.html');
+          alert("ERROR result go hmm:",result.message);
+        }
+      } catch (error) {
+        console.error(error);
+        alert('An error occurred while attempting to login. Please try again later.');
+      };
+
+    }
+
+    getdata();
+
+  </script>
+
+  <div id="data-container">
+    <p>Username: <span id="username"></span></p>
+    <p>Name: <span id="name"></span></p>
+    <p>Matrix: <span id="matrix"></span></p>
+    <p>Email: <span id="email"></span></p>
+    <p>Phone: <span id="phone"></span></p>
+    <p>Address: <span id="address"></span></p>
+  </div>
+  <a href="logout.html">Log out</a>
+</body>
+
 </html>
