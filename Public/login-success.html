@@ -7,8 +7,7 @@
 </head>
 
 <body>
-  <h1>Welcome back, User!</h1>
-  <p>You have successfully logged in.</p>
+  
 
   <script>
     async function getdata() {
@@ -29,6 +28,7 @@
         if (result.success) {
           // Login successful, redirect the user to the home page
           document.getElementById("username").innerHTML = result.username;
+          document.getElementById("username2").innerHTML = result.username;
           document.getElementById("name").innerHTML = result.name;
           document.getElementById("matrix").innerHTML = result.matrix;
           document.getElementById("email").innerHTML = result.email;
@@ -52,6 +52,8 @@
   </script>
 
   <div id="data-container">
+    <h1>Welcome back,  <span id="username2"></span>!</h1>
+  <p>You have successfully logged in.</p>
     <p>Username: <span id="username"></span></p>
     <p>Name: <span id="name"></span></p>
     <p>Matrix: <span id="matrix"></span></p>

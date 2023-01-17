@@ -5,7 +5,17 @@ const dotenv = require('dotenv');
 dotenv.config({ path: './.env' });
 
 const url = process.env.MONGODB_URI;
-const client = new MongoClient(url, { useNewUrlParser: true });
+
+const client = new MongoClient(url, {
+  useNewUrlParser: true,
+  // ssl: true,
+  // sslValidate: true,
+  // sslCA: "./SSL/ca.pem", // The CA file
+  // sslKey: "./SSL/mongodb.pem", // The key file
+  // sslCert: "./SSL/mongodb.pem",// The cert file
+  // tlsInsecure: true
+});
+
 const dbName = process.env.DB;
 const db = client.db(dbName);
 const collection = db.collection('users');
@@ -49,9 +59,9 @@ async function insertUser(user) {
 }
 
 async function getUserByUsername(username) {
-  console.log("/getUseBy username:", username);
+  // console.log("/getUseBy username:", username);
   const user = await collection.findOne({"username" : username });
-  console.log("Inside getUser function : ",user);
+  // console.log("Inside getUser function : ",user);
   return user;
 }
 
