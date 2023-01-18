@@ -1,56 +1,69 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Login</title>
+<div class="background">
+  <div class="shape"></div>
+  <div class="shape"></div>
+</div>
 
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-  </head>
-  <body>
-    <form id="login-form">
-      <label for="username">Username:</label>
-      <input type="text" id="username" name="username" required />
-      <br />
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required />
-      <br />  
-      <div class="g-recaptcha" data-sitekey="6LdGuLYjAAAAAIR9hxBqoFTJZt3CSn_3Chu8M6fA"z></div>
-      <button type="submit">Login</button>
-      <br />
-      <button type="button" onclick="window.location='register.html'">Register</button>
-    </form>
-    <script>
-      const form = document.getElementById('login-form');
-      form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const formData = {
-          username: form.username.value,
-          password: form.password.value,    
-          recaptcha : grecaptcha.getResponse()
-        };
-        try {
-          const response = await fetch('http://127.0.0.1:3000/login', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-          });
-          const result = await response.json();
-          if (result.success) { 
-            // Login successful, redirect the user to the home page
-            document.cookie = result.UserCookie;
-            window.location.replace('login-success.html');
-          } else {
-            // Login failed, display an error message
-            window.location.replace('login-failed.html');
-            alert(result.message);
-          }
-        } catch (error) {
-          console.error(error);
-          alert('An error occurred while attempting to login. Please try again later.');
-          window.location = 'login.html';
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link rel="stylesheet" href="./style.css" />
+  <title>Login</title>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+
+<body>
+
+  <form id="login-form">
+    <h3>Login</h3>
+    <label for="username">Username:</label>
+    <input type="text" id="username" placeholder=Username name="username" required />
+    <br />
+    <label for="password">Password:</label>
+    <input type="password" id="password" placeholder=Password name="password" required />
+    <br />
+    <div class="g-recaptcha" data-sitekey="6LdGuLYjAAAAAIR9hxBqoFTJZt3CSn_3Chu8M6fA" z></div>
+    <button type="button" class="register" onclick="window.location='register.html'">Register</button>
+    <button type="submit" >Login</button>
+
+
+  </form>
+  <script>
+    const form = document.getElementById('login-form');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = {
+        username: form.username.value,
+        password: form.password.value,
+        recaptcha: grecaptcha.getResponse()
+      };
+      try {
+        const response = await fetch('http://127.0.0.1:3000/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+        const result = await response.json();
+        if (result.success) {
+          // Login successful, redirect the user to the home page
+          document.cookie = result.UserCookie;
+          window.location.replace('login-success.html');
+        } else {
+          // Login failed, display an error message
+          window.location.replace('login-failed.html');
+          alert(result.message);
         }
-      });
-    </script>
-  </body>
+      } catch (error) {
+        console.error(error);
+        alert('An error occurred while attempting to login. Please try again later.');
+        window.location = 'login.html';
+      }
+    });
+  </script>
+</body>
+
 </html>

@@ -1,8 +1,15 @@
 <!-- login-success.html -->
 <!DOCTYPE html>
 <html>
-
+  <div class="background">
+    <div class="shape"></div>
+    <div class="shape"></div>
+  </div>
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link rel="stylesheet" href="./style3.css" />
   <title>Login Success</title>
 </head>
 
@@ -51,8 +58,8 @@
 
   </script>
 
-  <div id="data-container">
-    <h1>Welcome back,  <span id="username2"></span>!</h1>
+  <form id="data-container">
+    <h3>Welcome back,  <span id="username2"></span>!</h3>
   <p>You have successfully logged in.</p>
     <p>Username: <span id="username"></span></p>
     <p>Name: <span id="name"></span></p>
@@ -60,8 +67,9 @@
     <p>Email: <span id="email"></span></p>
     <p>Phone: <span id="phone"></span></p>
     <p>Address: <span id="address"></span></p>
-  </div>
-  <a href="logout.html">Log out</a>
+    <button type="button" onclick="window.location='logout.html'">Log out</button>
+  </form>
+
 </body>
 
 </html>
